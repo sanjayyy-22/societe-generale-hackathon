@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VBA Documentation Generator</title>
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        .form-group input[type=file] {
+            display: block;
+            width: calc(100% - 20px);
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        .form-group button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .form-group button:hover {
+            background-color: #45a049;
+        }
+        .success-message {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 18px;
+            color: #4CAF50;
+            display: none;
+        }
+        .success-message a {
+            color: #4CAF50;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .success-message a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>VBA Documentation Generator</h1>
+        <form id="uploadForm" enctype="multipart/form-data" action="/upload" method="post">
+            <div class="form-group">
+                <label for="fileInput">Select an Excel File (.xlsm):</label>
+                <input type="file" id="fileInput" name="file" accept=".xlsm" required>
+            </div>
+            <div class="form-group">
+                <button type="submit">Generate Documentation</button>
+            </div>
+        </form>
+        <div id="successMessage" class="success-message">
+            <p id="successMessageText">PDF documentation generated successfully. <a id="downloadLink" href="#" download>Download PDF</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = new FormData();
+            formData.append('file', document.getElementById('fileInput').files[0]);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('successMessage').style.display = 'block';
+                    const downloadLink = document.getElementById('downloadLink');
+                    downloadLink.href = data.pdf_url;
+                    downloadLink.setAttribute('download', 'vba_documentation.pdf');
+                    document.getElementById('successMessageText').innerHTML = `PDF documentation generated successfully. <a id="downloadLink" href="${data.pdf_url}" download>Download PDF</a>`;
+                } else {
+                    throw new Error('Failed to generate PDF documentation.');
+                }
+            } catch (error) {
+                alert(error.message);
+            }
+        };
+    </script>
+</body>
+</html>
+
+
+
+
